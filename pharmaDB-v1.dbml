@@ -1,0 +1,183 @@
+Table USER [headercolor: #175e7a] {
+	UID varchar(255) [ pk, not null ]
+	NAME varchar(255) [ not null ]
+	PASSWORD varchar(64) [ not null ]
+	EMPLOYER_ID varchar(255) [ not null ]
+}
+
+Table PHONES [headercolor: #175e7a] {
+	BUYER_ID varchar(255) [ pk, not null ]
+	PHONE int [ pk, not null ]
+	COUNTRY_CODE int [ pk, not null ]
+}
+
+Table BUYER [headercolor: #175e7a] {
+	BUYER_ID varchar(255) [ pk, not null ]
+	VAT int [ not null, unique ]
+	"BRAND NAME" varchar(255) [ not null ]
+	EMAIL varchar(255)
+}
+
+Table ADRESSES [headercolor: #175e7a] {
+	ID varchar(255) [ pk, not null ]
+	CITY varchar(255) [ not null ]
+	STREET varchar(255) [ not null ]
+	NUMBER varchar(255)
+	FLOOR int
+	POST_CODE int [ not null ]
+}
+
+Table BUYERS_ADRESSES [headercolor: #175e7a] {
+	BUYER_ID varchar(255) [ pk, not null ]
+	ADRESS_ID varchar(255) [ pk, not null ]
+}
+
+Table DELIVERY [headercolor: #175e7a] {
+	ID varchar(255) [ pk, not null ]
+	STATE varchar(255) [ not null ]
+	DATE_OF_ARRIVAL datetime [ not null ]
+	BUYER_ID varchar(255) [ not null ]
+}
+
+Table ORDER [headercolor: #175e7a] {
+	ID varchar(255) [ pk, not null ]
+	EXPECTED_DOA date
+	DATE_SUBMITED datetime [ not null ]
+	STATE varchar(255) [ not null ]
+	TOTAL_PRICE float [ not null ]
+	USER_ID varchar(255) [ not null ]
+	BUYER_ID varchar(255) [ not null ]
+}
+
+Table ORDER_LINE [headercolor: #175e7a] {
+	ID int [ pk, increment, not null ]
+	QUANTITY int [ not null ]
+	LINE_COST decimal [ not null ]
+	UNIT_COST decimal [ not null ]
+	ORDER_ID varchar(255) [ pk, not null ]
+	MED_ID varchar(255) [ not null ]
+}
+
+Table DELIVERY_LINE [headercolor: #175e7a] {
+	ID int [ pk, increment, not null ]
+	QUANTITY int [ not null ]
+	LINE_COST decimal [ not null ]
+	UNIT_COST decimal [ not null ]
+	ORDER__LINE_ID int [ not null ]
+	DELIVERY_ID varchar(255) [ not null ]
+	MED_ID varchar(255) [ not null ]
+}
+
+Table MEDICINE [headercolor: #175e7a] {
+	ID varchar(255) [ pk, not null ]
+	BARCODE varchar(255) [ not null, unique ]
+	NAME varchar(255) [ not null ]
+	PACKAGE_UNIT varchar(255) [ not null ]
+	USAGE_TYPE varchar(255)
+	DOSAGE_FORM varchar(255) [ not null ]
+}
+
+Table ACTIVE_SUBSTANCE [headercolor: #175e7a] {
+	ID int [ pk, not null ]
+	NAME varchar(255) [ not null, unique ]
+}
+
+Table MEDICINE_SUBSTANCE [headercolor: #175e7a] {
+	MEDICINE_ID varchar(255) [ pk, not null ]
+	SUB_ID int [ pk, not null ]
+	STRENGTH_VALUE decimal [ not null ]
+	STRENGTH_UNIT varchar(255) [ not null ]
+	PER_QTY decimal
+	PER_UNIT decimal
+}
+
+Table ORDER_DELIVERY [headercolor: #175e7a] {
+	ORD_ID varchar(255) [ pk, not null ]
+	DEV_ID varchar(255) [ pk, not null ]
+	STATUS varchar(255) [ not null ]
+}
+
+Table STOCK [headercolor: #175e7a] {
+	MED_ID varchar(255) [ pk, not null ]
+	LOCATION_ID varchar(255) [ pk, not null ]
+	QUANTITY_ON_HAND int [ not null ]
+}
+
+Table LOCATION [headercolor: #175e7a] {
+	ID varchar(255) [ pk, not null ]
+	SHELF int [ not null ]
+	ISLE varchar(255) [ not null ]
+	SECTION varchar(255)
+}
+
+Ref fk_BUYER_BUYER_ID_PHONES {
+	BUYER.BUYER_ID < PHONES.BUYER_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_USER_EMPLOYER_ID_BUYER {
+	USER.EMPLOYER_ID > BUYER.BUYER_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_ADRESSES_ID_BUYERS_ADRESSES {
+	ADRESSES.ID < BUYERS_ADRESSES.ADRESS_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_BUYER_BUYER_ID_BUYERS_ADRESSES {
+	BUYER.BUYER_ID < BUYERS_ADRESSES.BUYER_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_BUYER_BUYER_ID_DELIVERY {
+	BUYER.BUYER_ID < DELIVERY.BUYER_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_USER_UID_ORDER {
+	USER.UID < ORDER.USER_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_BUYER_BUYER_ID_ORDER {
+	BUYER.BUYER_ID < ORDER.BUYER_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_ORDER_ID_ORDER_LINE {
+	ORDER.ID < ORDER_LINE.ORDER_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_MEDICINE_SUBSTANCE_MEDICINE_ID_MEDICINE {
+	MEDICINE_SUBSTANCE.MEDICINE_ID > MEDICINE.ID [ delete: no action, update: no action ]
+}
+
+Ref fk_MEDICINE_SUBSTANCE_SUB_ID_ACTIVE_SUBSTANCE {
+	MEDICINE_SUBSTANCE.SUB_ID > ACTIVE_SUBSTANCE.ID [ delete: no action, update: no action ]
+}
+
+Ref fk_MEDICINE_ID_ORDER_LINE {
+	MEDICINE.ID < ORDER_LINE.MED_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_ORDER_ID_ORDER_DELIVERY {
+	ORDER.ID < ORDER_DELIVERY.ORD_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_DELIVERY_ID_ORDER_DELIVERY {
+	DELIVERY.ID < ORDER_DELIVERY.DEV_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_STOCK_MED_ID_MEDICINE {
+	STOCK.MED_ID > MEDICINE.ID [ delete: no action, update: no action ]
+}
+
+Ref fk_LOCATION_ID_STOCK {
+	LOCATION.ID > STOCK.LOCATION_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_DELIVERY_BUYER_ID_DELIVERY_LINE {
+	DELIVERY.BUYER_ID < DELIVERY_LINE.DELIVERY_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_MEDICINE_ID_DELIVERY_LINE {
+	MEDICINE.ID < DELIVERY_LINE.MED_ID [ delete: no action, update: no action ]
+}
+
+Ref fk_DELIVERY_LINE_ORDER__LINE_ID_ORDER_LINE {
+	DELIVERY_LINE.ORDER__LINE_ID > ORDER_LINE.ID [ delete: no action, update: no action ]
+}
