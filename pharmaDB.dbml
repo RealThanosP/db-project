@@ -1,8 +1,11 @@
+// SQL triggers and transaction requirements are documented in SCHEMA.md.
+
 Table User [headercolor: #175e7a] {
 	id varchar(255) [ pk, not null, unique ]
 	name varchar(255) [ not null ]
 	password varchar(255) [ not null ]
 	employer_id varchar(255)
+	Note: 'password contains a password hash, never plaintext. employer_id is optional for customer accounts; warehouse staff use NULL.'
 }
 
 Table Pharmacy [headercolor: #175e7a] {
@@ -29,10 +32,19 @@ Table Address [headercolor: #175e7a] {
 Table Delivery [headercolor: #175e7a] {
 	id varchar(255) [ pk, not null ]
 	state varchar(255) [ not null ]
-	dispatch_date datetime [ not null ]
-	date_of_arrival datetime [ not null ]
+	dispatch_date datetime
+	date_of_arrival datetime
 	address_id varchar(255) [ not null ]
 	order_id varchar(255) [ not null ]
+	indexes {
+		(id, order_id) [unique]
+	}
+	checks {
+		`state IN ('pending', 'dispatched', 'delivered')`
+		`(state = 'pending' AND dispatch_date IS NULL AND date_of_arrival IS NULL) OR (state = 'dispatched' AND dispatch_date IS NOT NULL AND date_of_arrival IS NULL) OR (state = 'delivered' AND dispatch_date IS NOT NULL AND date_of_arrival IS NOT NULL)`
+		`date_of_arrival IS NULL OR date_of_arrival >= dispatch_date`
+	}
+	Note: 'Create pending, add lines and batch allocations, then dispatch. SQL triggers require complete allocations before dispatch.'
 }
 
 Table Delivery_Items [headercolor: #175e7a] {
@@ -40,22 +52,36 @@ Table Delivery_Items [headercolor: #175e7a] {
 	delivery_id varchar(255) [ pk, not null ]
 	quantity integer [ not null ]
 	order_id varchar(255) [ not null ]
-	order_item_idx integer
+	order_item_idx integer [ not null ]
+	checks {
+		`typeof(quantity) = 'integer' AND quantity > 0`
+	}
 }
 
 Table Batch [headercolor: #175e7a] {
 	id integer [ pk, increment, not null ]
-	med_id integer [ pk, not null ]
+	med_id integer [ not null ]
 	exp_date date [ not null ]
 	available_qty integer [ not null ]
 	number integer [ not null ]
+	indexes {
+		(id, med_id) [unique]
+	}
+	checks {
+		`typeof(available_qty) = 'integer' AND available_qty >= 0`
+	}
+	Note: 'available_qty is physical on-hand stock, before outstanding reservations. id is globally unique.'
 }
 
 Table Selected_Delivery_Items_Batch [headercolor: #175e7a] {
-	delivery_item_idx integer [ pk, increment, not null ]
+	delivery_item_idx integer [ pk, not null ]
 	delivery_id varchar(255) [ pk, not null ]
 	batch_id integer [ pk, not null ]
 	quantity_delivered_per_batch integer [ not null ]
+	checks {
+		`typeof(quantity_delivered_per_batch) = 'integer' AND quantity_delivered_per_batch > 0`
+	}
+	Note: 'SQL triggers enforce matching medicines, allocation totals and pending batch availability.'
 }
 
 Table Order [headercolor: #175e7a] {
@@ -64,6 +90,8 @@ Table Order [headercolor: #175e7a] {
 	submit_date datetime [ not null ]
 	state varchar(255) [ not null ]
 	user_id varchar(255) [ not null ]
+	pharmacy_id varchar(255) [ not null ]
+	Note: 'pharmacy_id is the customer; user_id is the employee who entered the order.'
 }
 
 Table Order_Items [headercolor: #175e7a] {
@@ -72,6 +100,10 @@ Table Order_Items [headercolor: #175e7a] {
 	wanted_qty integer [ not null ]
 	refused_qty integer [ not null ]
 	medicine_id integer [ not null ]
+	checks {
+		`typeof(wanted_qty) = 'integer' AND wanted_qty > 0`
+		`typeof(refused_qty) = 'integer' AND refused_qty >= 0 AND refused_qty <= wanted_qty`
+	}
 }
 
 Table Returns [headercolor: #175e7a] {
@@ -81,13 +113,19 @@ Table Returns [headercolor: #175e7a] {
 	return_date date [ pk, not null ]
 	return_reason varchar(255) [ not null ]
 	return_qty integer [ not null ]
+	checks {
+		`typeof(return_qty) = 'integer' AND return_qty > 0`
+	}
 }
 
 Table Commits [headercolor: #175e7a] {
 	order_id varchar(255) [ pk, not null ]
 	order_item_idx integer [ pk, not null ]
-	medicine_id integer [ not null ]
 	commited_qty integer [ not null ]
+	checks {
+		`typeof(commited_qty) = 'integer' AND commited_qty >= 0`
+	}
+	Note: 'Outstanding reservations only. Medicine is derived from Order_Items. Release on dispatch or cancellation.'
 }
 
 Table Medicine [headercolor: #175e7a] {
@@ -96,6 +134,10 @@ Table Medicine [headercolor: #175e7a] {
 	measure_unit varchar(255) [ not null ]
 	package_qty integer [ not null ]
 	unit_price real [ not null ]
+	checks {
+		`package_qty > 0`
+		`unit_price >= 0`
+	}
 }
 
 Table Active_Substances [headercolor: #175e7a] {
@@ -103,84 +145,31 @@ Table Active_Substances [headercolor: #175e7a] {
 }
 
 Table Medicine_Composition [headercolor: #175e7a] {
-	barcode integer [ pk, increment, not null ]
+	barcode integer [ pk, not null ]
 	substance_name varchar(255) [ pk, not null ]
 	content real [ not null ]
 	content_unit varchar(255) [ not null ]
+	checks {
+		`content > 0`
+	}
 }
 
-Ref fk_Pharmacy_id_Phones {
-	Pharmacy.id < Phones.pharmacy_id [ delete: no action, update: no action ]
-}
-
-Ref fk_Pharmacy_address_id_Address {
-	Pharmacy.address_id < Address.id [ delete: no action, update: no action ]
-}
-
-Ref fk_Pharmacy_id_User {
-	Pharmacy.id < User.id [ delete: no action, update: no action ]
-}
-
-Ref fk_Delivery_address_id_Address {
-	Delivery.address_id > Address.id [ delete: no action, update: no action ]
-}
-
-Ref fk_Delivery_id_Delivery_Items {
-	Delivery.id < Delivery_Items.delivery_id [ delete: no action, update: no action ]
-}
-
-Ref fk_Selected_Delivery_Items_Batch_delivery_item_idx_Delivery_Items {
-	Selected_Delivery_Items_Batch.(delivery_item_idx, delivery_id) < Delivery_Items.(item_idx, delivery_id) [ delete: no action, update: no action ]
-}
-
-Ref fk_Batch_id_Selected_Delivery_Items_Batch {
-	Batch.id > Selected_Delivery_Items_Batch.batch_id [ delete: no action, update: no action ]
-}
-
-Ref fk_Order_id_Order_Items {
-	Order.id < Order_Items.order_id [ delete: no action, update: no action ]
-}
-
-Ref fk_Order_user_id_User {
-	Order.user_id < User.id [ delete: no action, update: no action ]
-}
-
-Ref fk_Returns_batch_id_Batch {
-	Returns.(batch_id, med_id) > Batch.(id, med_id) [ delete: no action, update: no action ]
-}
-
-Ref fk_Returns_pharmacy_id_Pharmacy {
-	Returns.pharmacy_id < Pharmacy.id [ delete: no action, update: no action ]
-}
-
-Ref fk_Active_Substances_inn_name_Medicine_Composition {
-	Active_Substances.inn_name < Medicine_Composition.substance_name [ delete: no action, update: no action ]
-}
-
-Ref fk_Commits_order_item_idx_Order_Items {
-	Commits.(order_item_idx, order_id) - Order_Items.(idx, order_id) [ delete: no action, update: no action ]
-}
-
-Ref fk_Medicine_barcode_Medicine_Composition {
-	Medicine.barcode < Medicine_Composition.barcode [ delete: no action, update: no action ]
-}
-
-Ref fk_Commits_medicine_id_Medicine {
-	Commits.medicine_id > Medicine.barcode [ delete: no action, update: no action ]
-}
-
-Ref fk_Delivery_Items_order_id_Order_Items {
-	Delivery_Items.(order_id, order_item_idx) > Order_Items.(order_id, idx) [ delete: no action, update: no action ]
-}
-
-Ref fk_Delivery_order_id_Order {
-	Delivery.order_id > Order.id [ delete: no action, update: no action ]
-}
-
-Ref fk_Order_Items_medicine_id_Medicine {
-	Order_Items.medicine_id > Medicine.barcode [ delete: no action, update: no action ]
-}
-
-Ref fk_Batch_med_id_Medicine {
-	Batch.med_id > Medicine.barcode [ delete: no action, update: no action ]
-}
+Ref: User.employer_id > Pharmacy.id
+Ref: Pharmacy.address_id > Address.id
+Ref: Phones.pharmacy_id > Pharmacy.id
+Ref: Delivery.address_id > Address.id
+Ref: Delivery.order_id > Order.id
+Ref: Delivery_Items.(delivery_id, order_id) > Delivery.(id, order_id)
+Ref: Delivery_Items.(order_id, order_item_idx) > Order_Items.(order_id, idx)
+Ref: Batch.med_id > Medicine.barcode
+Ref: Selected_Delivery_Items_Batch.(delivery_item_idx, delivery_id) > Delivery_Items.(item_idx, delivery_id)
+Ref: Selected_Delivery_Items_Batch.batch_id > Batch.id
+Ref: Order.user_id > User.id
+Ref: Order.pharmacy_id > Pharmacy.id
+Ref: Order_Items.order_id > Order.id
+Ref: Order_Items.medicine_id > Medicine.barcode
+Ref: Returns.(batch_id, med_id) > Batch.(id, med_id)
+Ref: Returns.pharmacy_id > Pharmacy.id
+Ref: Commits.(order_id, order_item_idx) > Order_Items.(order_id, idx)
+Ref: Medicine_Composition.barcode > Medicine.barcode
+Ref: Medicine_Composition.substance_name > Active_Substances.inn_name
