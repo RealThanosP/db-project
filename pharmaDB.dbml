@@ -1,0 +1,186 @@
+Table User [headercolor: #175e7a] {
+	id varchar(255) [ pk, not null, unique ]
+	name varchar(255) [ not null ]
+	password varchar(255) [ not null ]
+	employer_id varchar(255)
+}
+
+Table Pharmacy [headercolor: #175e7a] {
+	id varchar(255) [ pk, not null ]
+	VAT integer [ not null ]
+	email varchar(255)
+	name varchar(255) [ not null ]
+	address_id varchar(255) [ not null ]
+}
+
+Table Phones [headercolor: #175e7a] {
+	phone integer [ pk, not null ]
+	pharmacy_id varchar(255) [ pk, not null ]
+}
+
+Table Address [headercolor: #175e7a] {
+	id varchar(255) [ pk, not null ]
+	city varchar(255) [ not null ]
+	street varchar(255) [ not null ]
+	st_number integer
+	floor integer
+}
+
+Table Delivery [headercolor: #175e7a] {
+	id varchar(255) [ pk, not null ]
+	state varchar(255) [ not null ]
+	dispatch_date datetime [ not null ]
+	date_of_arrival datetime [ not null ]
+	address_id varchar(255) [ not null ]
+	order_id varchar(255) [ not null ]
+}
+
+Table Delivery_Items [headercolor: #175e7a] {
+	item_idx integer [ pk, not null ]
+	delivery_id varchar(255) [ pk, not null ]
+	quantity integer [ not null ]
+	order_id varchar(255) [ not null ]
+	order_item_idx integer
+}
+
+Table Batch [headercolor: #175e7a] {
+	id integer [ pk, increment, not null ]
+	med_id integer [ pk, not null ]
+	exp_date date [ not null ]
+	available_qty integer [ not null ]
+	number integer [ not null ]
+}
+
+Table Selected_Delivery_Items_Batch [headercolor: #175e7a] {
+	delivery_item_idx integer [ pk, increment, not null ]
+	delivery_id varchar(255) [ pk, not null ]
+	batch_id integer [ pk, not null ]
+	quantity_delivered_per_batch integer [ not null ]
+}
+
+Table Order [headercolor: #175e7a] {
+	id varchar(255) [ pk, not null ]
+	exp_doa date
+	submit_date datetime [ not null ]
+	state varchar(255) [ not null ]
+	user_id varchar(255) [ not null ]
+}
+
+Table Order_Items [headercolor: #175e7a] {
+	order_id varchar(255) [ pk, not null ]
+	idx integer [ pk, not null ]
+	wanted_qty integer [ not null ]
+	refused_qty integer [ not null ]
+	medicine_id integer [ not null ]
+}
+
+Table Returns [headercolor: #175e7a] {
+	batch_id integer [ pk, not null ]
+	med_id integer [ pk, not null ]
+	pharmacy_id varchar(255) [ pk, not null ]
+	return_date date [ pk, not null ]
+	return_reason varchar(255) [ not null ]
+	return_qty integer [ not null ]
+}
+
+Table Commits [headercolor: #175e7a] {
+	order_id varchar(255) [ pk, not null ]
+	order_item_idx integer [ pk, not null ]
+	medicine_id integer [ not null ]
+	commited_qty integer [ not null ]
+}
+
+Table Medicine [headercolor: #175e7a] {
+	barcode integer [ pk, not null ]
+	commercial_name varchar(255) [ not null ]
+	measure_unit varchar(255) [ not null ]
+	package_qty integer [ not null ]
+	unit_price real [ not null ]
+}
+
+Table Active_Substances [headercolor: #175e7a] {
+	inn_name varchar(255) [ pk, not null ]
+}
+
+Table Medicine_Composition [headercolor: #175e7a] {
+	barcode integer [ pk, increment, not null ]
+	substance_name varchar(255) [ pk, not null ]
+	content real [ not null ]
+	content_unit varchar(255) [ not null ]
+}
+
+Ref fk_Pharmacy_id_Phones {
+	Pharmacy.id < Phones.pharmacy_id [ delete: no action, update: no action ]
+}
+
+Ref fk_Pharmacy_address_id_Address {
+	Pharmacy.address_id < Address.id [ delete: no action, update: no action ]
+}
+
+Ref fk_Pharmacy_id_User {
+	Pharmacy.id < User.id [ delete: no action, update: no action ]
+}
+
+Ref fk_Delivery_address_id_Address {
+	Delivery.address_id > Address.id [ delete: no action, update: no action ]
+}
+
+Ref fk_Delivery_id_Delivery_Items {
+	Delivery.id < Delivery_Items.delivery_id [ delete: no action, update: no action ]
+}
+
+Ref fk_Selected_Delivery_Items_Batch_delivery_item_idx_Delivery_Items {
+	Selected_Delivery_Items_Batch.(delivery_item_idx, delivery_id) < Delivery_Items.(item_idx, delivery_id) [ delete: no action, update: no action ]
+}
+
+Ref fk_Batch_id_Selected_Delivery_Items_Batch {
+	Batch.id > Selected_Delivery_Items_Batch.batch_id [ delete: no action, update: no action ]
+}
+
+Ref fk_Order_id_Order_Items {
+	Order.id < Order_Items.order_id [ delete: no action, update: no action ]
+}
+
+Ref fk_Order_user_id_User {
+	Order.user_id < User.id [ delete: no action, update: no action ]
+}
+
+Ref fk_Returns_batch_id_Batch {
+	Returns.(batch_id, med_id) > Batch.(id, med_id) [ delete: no action, update: no action ]
+}
+
+Ref fk_Returns_pharmacy_id_Pharmacy {
+	Returns.pharmacy_id < Pharmacy.id [ delete: no action, update: no action ]
+}
+
+Ref fk_Active_Substances_inn_name_Medicine_Composition {
+	Active_Substances.inn_name < Medicine_Composition.substance_name [ delete: no action, update: no action ]
+}
+
+Ref fk_Commits_order_item_idx_Order_Items {
+	Commits.(order_item_idx, order_id) - Order_Items.(idx, order_id) [ delete: no action, update: no action ]
+}
+
+Ref fk_Medicine_barcode_Medicine_Composition {
+	Medicine.barcode < Medicine_Composition.barcode [ delete: no action, update: no action ]
+}
+
+Ref fk_Commits_medicine_id_Medicine {
+	Commits.medicine_id > Medicine.barcode [ delete: no action, update: no action ]
+}
+
+Ref fk_Delivery_Items_order_id_Order_Items {
+	Delivery_Items.(order_id, order_item_idx) > Order_Items.(order_id, idx) [ delete: no action, update: no action ]
+}
+
+Ref fk_Delivery_order_id_Order {
+	Delivery.order_id > Order.id [ delete: no action, update: no action ]
+}
+
+Ref fk_Order_Items_medicine_id_Medicine {
+	Order_Items.medicine_id > Medicine.barcode [ delete: no action, update: no action ]
+}
+
+Ref fk_Batch_med_id_Medicine {
+	Batch.med_id > Medicine.barcode [ delete: no action, update: no action ]
+}
