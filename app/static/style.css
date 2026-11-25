@@ -268,7 +268,8 @@ input:focus-visible {
   -webkit-appearance: none;
   margin: 0;
 }
-.cart-add-button, .cart-remove {
+.cart-add-button,
+.cart-remove {
   border: 0;
   border-radius: 7px;
   padding: 8px 12px;
@@ -277,7 +278,8 @@ input:focus-visible {
   font: inherit;
   cursor: pointer;
 }
-.cart-add-button:hover, .cart-remove:hover {
+.cart-add-button:hover,
+.cart-remove:hover {
   background: #1e624e;
 }
 .cart-add-button {

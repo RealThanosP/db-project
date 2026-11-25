@@ -59,9 +59,16 @@
           <td>
             <div class="cart-add">
               <label class="sr-only" for="quantity-{{ medicine.barcode }}">Packages of {{ medicine.name }}</label>
-              <input id="quantity-{{ medicine.barcode }}" type="number" min="1" max="1000000" step="1" value="1" required>
-              <button type="button" class="cart-add-button" aria-label="Add {{ medicine.name }} to cart" title="Add to cart">
-                <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1"></circle><circle cx="19" cy="20" r="1"></circle><path d="M2 3h2l2.4 11.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L22 7H5"></path></svg>
+              <input id="quantity-{{ medicine.barcode }}" type="number" min="1" max="1000000" step="1" value="1"
+                required>
+              <button type="button" class="cart-add-button" aria-label="Add {{ medicine.name }} to cart"
+                title="Add to cart">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="20" r="1"></circle>
+                  <circle cx="19" cy="20" r="1"></circle>
+                  <path d="M2 3h2l2.4 11.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L22 7H5"></path>
+                </svg>
               </button>
             </div>
           </td>
