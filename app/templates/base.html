@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}{% endblock %} · PharmaStock</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-icon" aria-hidden="true">✳</span><span>Pharma<span
+          class="brand-light">Stock</span><small>PHARMACY WAREHOUSE</small></span></a>
+    <nav aria-label="Workspace navigation" class="topnav">
+      {% if view == 'pharmacy' %}
+      <a href="{{ url_for('pharmacy') }}#catalog">Catalog</a>
+      <a href="{{ url_for('pharmacy') }}#orders">Orders</a>
+      <a href="{{ url_for('pharmacy') }}#cart">Cart</a>
+      {% elif view == 'warehouse' %}
+      <a href="{{ url_for('warehouse') }}#customers">Customers</a>
+      <a href="{{ url_for('warehouse') }}#catalog">Catalog</a>
+      <a href="{{ url_for('warehouse') }}#orders">Orders</a>
+      <a href="{{ url_for('warehouse') }}#deliveries">Deliveries</a>
+      {% else %}
+      <a href="{{ url_for('pharmacy') }}">Pharmacy</a>
+      <a href="{{ url_for('warehouse') }}">Warehouse</a>
+      {% endif %}
+    </nav>
+    {% if view %}<span class="preview-label">{{ view|capitalize }} workspace</span>{% endif %}
+  </header>
+  <main class="page">{% block content %}{% endblock %}</main>
+  <footer>PharmaStock <span>·</span> {{ 'Catalog data and sample workspace' if view == 'pharmacy' else 'Interface
+    preview with sample data' }}</footer>
+</body>
+
+</html>

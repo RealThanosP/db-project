@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}
+Choose a view
+{% endblock %}
+{% block content%}
+<section class="intro landing-intro">
+  <h1>Welcome to PharmaStock.</h1>
+  <p>Choose a workspace to explore the page templates.</p>
+</section>
+<div class="workspace-grid">
+  <a class="workspace-card" href="{{ url_for('pharmacy') }}"><span class="workspace-icon">✚</span><span
+      class="card-kicker">FOR PHARMACIES</span>
+    <h2>Medicine catalog <span>↗</span></h2>
+    <p>Browse medicines, packaging, and available quantities.</p><strong>Open pharmacy view →</strong>
+  </a>
+  <a class="workspace-card warehouse-card" href="{{ url_for('warehouse') }}"><span class="workspace-icon">▦</span><span
+      class="card-kicker">FOR WAREHOUSE STAFF</span>
+    <h2>Inventory overview <span>↗</span></h2>
+    <p>Review customers, orders, and delivery status.</p><strong>Open warehouse view →</strong>
+  </a>
+</div>
+{% endblock %}

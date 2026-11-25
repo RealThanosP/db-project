@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Medicine catalog{% endblock %}
+{% block content %}
+<div class="breadcrumb"><span>/</span> CATALOG</div>
+<section class="intro title-row">
+  <div>
+    <p class="eyebrow">YOUR MEDICINE CATALOG</p>
+    <h1>Find what you need.</h1>
+    <p>Browse the catalog and check available quantities at a glance.</p>
+  </div>
+  <div class="illustration" aria-hidden="true">✚</div>
+</section>
+{% include 'catalog.html' %}
+
+{% include 'order.html' %}
+
+{% include 'cart.html' %}
+
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block title %}Warehouse workspace{% endblock %}
+{% block content %}
+<div class="breadcrumb">WAREHOUSE WORKSPACE <span>/</span> OVERVIEW</div>
+<section class="intro title-row">
+  <div>
+    <p class="eyebrow">WAREHOUSE OVERVIEW</p>
+    <h1>Keep things moving.</h1>
+    <p>Review your customers, catalog, orders, and deliveries in one place.</p>
+  </div>
+  <div class="illustration warehouse-illustration" aria-hidden="true">▦</div>
+</section>
+<div class="notice"><strong>Preview mode</strong><span>All warehouse details shown here are sample data.</span></div>
+<section class="catalog workspace-section" id="customers" aria-labelledby="customers-title">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">PHARMACY ACCOUNTS</p>
+      <h2 id="customers-title">Customers <span class="count">3</span></h2>
+    </div><span class="muted">Sample data</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Pharmacy</th>
+          <th>Location</th>
+          <th>Contact</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Central Pharmacy</strong></td>
+          <td>Athens</td>
+          <td>central@example.com</td>
+          <td><span class="status in"><i></i>Active</span></td>
+        </tr>
+        <tr>
+          <td><strong>Healthpoint Pharmacy</strong></td>
+          <td>Patras</td>
+          <td>healthpoint@example.com</td>
+          <td><span class="status in"><i></i>Active</span></td>
+        </tr>
+        <tr>
+          <td><strong>Olive Pharmacy</strong></td>
+          <td>Thessaloniki</td>
+          <td>olive@example.com</td>
+          <td><span class="status in"><i></i>Active</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% include 'catalog.html' %}
+<section class="catalog workspace-section" id="orders" aria-labelledby="orders-title">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">ALL PHARMACIES</p>
+      <h2 id="orders-title">Orders</h2>
+    </div><span class="muted">Sample data</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Pharmacy</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">#ORD-1042</td>
+          <td>Central Pharmacy</td>
+          <td>12 Nov 2026</td>
+          <td>€124.50</td>
+          <td><span class="status in"><i></i>Completed</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-1048</td>
+          <td>Healthpoint Pharmacy</td>
+          <td>17 Nov 2026</td>
+          <td>€68.00</td>
+          <td><span class="status low"><i></i>Processing</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-1049</td>
+          <td>Olive Pharmacy</td>
+          <td>18 Nov 2026</td>
+          <td>€89.20</td>
+          <td><span class="status low"><i></i>Pending</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section class="catalog workspace-section" id="deliveries" aria-labelledby="deliveries-title">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">DELIVERY STATUS</p>
+      <h2 id="deliveries-title">Deliveries</h2>
+    </div><span class="muted">Sample data</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Delivery</th>
+          <th>Order</th>
+          <th>Pharmacy</th>
+          <th>Expected</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">#DEL-301</td>
+          <td>#ORD-1042</td>
+          <td>Central Pharmacy</td>
+          <td>14 Nov 2026</td>
+          <td><span class="status in"><i></i>Delivered</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#DEL-302</td>
+          <td>#ORD-1048</td>
+          <td>Healthpoint Pharmacy</td>
+          <td>19 Nov 2026</td>
+          <td><span class="status low"><i></i>In transit</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#DEL-303</td>
+          <td>#ORD-1049</td>
+          <td>Olive Pharmacy</td>
+          <td>20 Nov 2026</td>
+          <td><span class="status low"><i></i>Preparing</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

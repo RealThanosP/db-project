@@ -1,0 +1,29 @@
+<section class="catalog workspace-section" id="cart" aria-labelledby="cart-title">
+    <div class="section-head">
+        <div>
+            <h2 id="cart-title">Cart</h2>
+        </div><span class="muted">Saved in this browser tab · stock is not reserved</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Packaging</th>
+                    <th>Quantity</th>
+                    <th>Price / pack</th>
+                    <th>Subtotal</th>
+                    <th><span class="sr-only">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="6" class="empty">Your cart is empty.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-footer">Total: €0.00</div>
+    <p class="cart-message" role="status" aria-live="polite"></p>
+</section>
+<script src="{{ url_for('static', filename='cart.js') }}" defer></script>
